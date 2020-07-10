@@ -1,2 +1,3 @@
 # Bexs-Challenge
-Software developer challenge from Bexs bank.
+
+Software developer challenge from Bexs bank
