@@ -17,7 +17,7 @@ As good practice using [Docker](https://docs.docker.com/) to manage
 ### Requirements
 
 - [Docker](https://docs.docker.com/)
-- [Make]()
+- [GNU make](https://www.gnu.org/software/make/)
 
 ## How to use
 
@@ -55,6 +55,7 @@ Routes:
 
 - https://github.com/ardanlabs/service/wiki
 - https://www.dudley.codes/posts/2020.05.19-golang-structure-web-servers
+
 <!-- 
 ├── app/                    # entry point newcomers gravitate towards when exploring the codebase
 |   └── service-api/        # micro-service API for this repository; all HTTP implementation details live here
@@ -78,6 +79,5 @@ Routes:
 └── pkg/                    # packages that are encouraged to be imported by projects outside this repo
     ├── client/             # library for accessing service-api. Other teams can import it without having to write their own
     └── dtos/               # data transfer objects, structs designed for sharing data between packages and encoding/transmitting. /internal/service is responsible for mapping the DTOs to/from its internal models -->
-
 
 <!-- TODO add gitignore dockerignore -->
