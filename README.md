@@ -4,7 +4,7 @@ Software developer challenge from Bexs bank
 
 ## Disclaimer
 
-To software's mission is to assert to client the best option of transfer for desired destiny.
+To software's mission is to assert to client the best option of transfer for desired destination.
 
 ## Development
 
@@ -36,7 +36,7 @@ GRU,CDG,75
 make start
 ```
 
-### Consuming via* terminal* client
+### Consuming via* terminal* interface
 
 <!-- TODO decrever como usar via terminal -->
 
