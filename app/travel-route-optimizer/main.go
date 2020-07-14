@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+
+	"github.com/victorabarros/challenge-bexs/internal/database"
 )
 
 var (
@@ -12,12 +14,13 @@ var (
 func main() {
 	flag.Parse() // `go run main.go -h` for help flag
 
-	rots := database.routes{}
-	rots.loadCsv(*csvName)
+	rots := database.Routes{}
+	rots.LoadCsv(*csvName)
 
 	for origin, options := range rots {
-		for destiny, price := range options {
-			fmt.Println(origin, destiny, price)
+		for destination, price := range options {
+			fmt.Println(origin, destination, price)
 		}
 	}
+	// Up Server
 }
