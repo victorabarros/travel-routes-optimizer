@@ -12,7 +12,7 @@ const (
 
 var (
 	testLines = []string{
-		"GRU,BRC,10",
+		"GRU,BRC,10.5",
 		"BRC,SCL,5",
 		"GRU,CDG,75",
 	}
@@ -53,7 +53,7 @@ func TestLoadCsvSuccess(t *testing.T) {
 
 	for orig, v := range r {
 		for dest, pric := range v {
-			join := fmt.Sprintf("%s,%s,%d", orig, dest, pric)
+			join := fmt.Sprintf("%s,%s,%v", orig, dest, pric)
 			if !contains(testLines, join) {
 				t.Errorf("\"%s\" doesn't contains \"%s\"", testLines, join)
 			}

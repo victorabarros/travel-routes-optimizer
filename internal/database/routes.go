@@ -10,7 +10,7 @@ import (
 
 // Routes it's simple dictionary of travel routes
 // r[origin][destination] = price
-type Routes map[string]map[string]int
+type Routes map[string]map[string]float64
 
 // LoadCsv loads the startup csv file
 func (r Routes) LoadCsv(csvName string) error {
@@ -42,14 +42,14 @@ func (r Routes) LoadCsv(csvName string) error {
 func (r Routes) fillRoutes(lines [][]string) (err error) {
 	for idx, line := range lines {
 		orig, dest := line[0], line[1]
-		price, ok := strconv.Atoi(line[2])
+		price, ok := strconv.ParseFloat(line[2], 64)
 		if ok != nil {
 			return fmt.Errorf("field \"%s\", from line %d, isn't a valid value for price", line[2], idx+1)
 		}
 
 		_, prs := r[orig]
 		if !prs {
-			r[orig] = make(map[string]int)
+			r[orig] = make(map[string]float64)
 		}
 
 		r[orig][dest] = price
