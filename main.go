@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"time"
 
+	"github.com/victorabarros/challenge-bexs/app/server"
 	"github.com/victorabarros/challenge-bexs/internal/database"
 )
 
@@ -21,8 +23,13 @@ func main() {
 
 	for origin, options := range rots {
 		for destination, price := range options {
-			fmt.Println(origin, destination, price)
+			fmt.Printf("%s\t%s\t%0.2f\n", origin, destination, price)
 		}
 	}
+
 	// Up Server
+	server.Run()
+
+	// terminal
+	time.Sleep(1 * time.Hour)
 }
