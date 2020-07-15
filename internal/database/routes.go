@@ -1,11 +1,11 @@
 package database
 
 import (
-	"encoding/csv"
 	"fmt"
-	"os"
 	"strconv"
 	"time"
+
+	"github.com/victorabarros/challenge-bexs/internal"
 )
 
 // Routes it's simple dictionary of travel routes
@@ -13,11 +13,11 @@ import (
 type Routes map[string]map[string]int
 
 // LoadCsv loads the startup csv file
-func (r Routes) LoadCsv(csvName string) {
+func (r Routes) LoadCsv(csvName string) error {
 	fmt.Printf("Loading file %s\n", csvName)
-	csvLines, err := readCsv(csvName)
+	csvLines, err := internal.ReadCsv(csvName)
 	if err != nil {
-		panic(err) // TODO better os.fatal or logrus.fatal
+		return err
 	}
 
 	done := make(chan error)
@@ -26,14 +26,14 @@ func (r Routes) LoadCsv(csvName string) {
 	}()
 
 	for {
-		for _, r := range `-\|/` {
-			select {
-			case <-done:
-				fmt.Print("\r")
-				return
-			default:
+		select {
+		case err := <-done:
+			fmt.Print("\r")
+			return err
+		default:
+			for _, r := range `-\|/` {
 				fmt.Printf("\r%c", r)
-				time.Sleep(100 * time.Millisecond)
+				time.Sleep(80 * time.Millisecond)
 			}
 		}
 	}
@@ -44,8 +44,7 @@ func (r Routes) fillRoutes(lines [][]string) (err error) {
 		orig, dest := line[0], line[1]
 		price, ok := strconv.Atoi(line[2])
 		if ok != nil {
-			fmt.Printf("Field \"%s\", from line %d, isn't a valid value for price\n", line[2], idx+1)
-			panic("") // TODO better os.fatal or logrus.fatal
+			return fmt.Errorf("field \"%s\", from line %d, isn't a valid value for price", line[2], idx+1)
 		}
 
 		_, prs := r[orig]
@@ -56,19 +55,4 @@ func (r Routes) fillRoutes(lines [][]string) (err error) {
 		r[orig][dest] = price
 	}
 	return nil
-}
-
-// TODO: faz sentido a camada de DB abrir e um arquivo?
-func readCsv(fileName string) ([][]string, error) {
-	file, err := os.Open(fileName)
-	defer file.Close()
-	if err != nil {
-		return nil, err
-	}
-	lines, err := csv.NewReader(file).ReadAll()
-	if err != nil {
-		return nil, err
-	}
-
-	return lines, nil
 }

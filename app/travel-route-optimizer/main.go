@@ -15,7 +15,9 @@ func main() {
 	flag.Parse() // `go run main.go -h` for help flag
 
 	rots := database.Routes{}
-	rots.LoadCsv(*csvName)
+	if err := rots.LoadCsv(*csvName); err != nil {
+		panic(err)
+	}
 
 	for origin, options := range rots {
 		for destination, price := range options {
