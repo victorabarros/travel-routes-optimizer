@@ -123,4 +123,6 @@ $RECYCLE.BIN/
 .vscode/
 vendor/
 .env
-*.log
+test*.log
+test*.csv
+input-file.txt

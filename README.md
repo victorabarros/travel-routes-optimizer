@@ -13,6 +13,7 @@ The programming language choiced was [Golang](https://golang.org/), that's has g
 As good practice using [Docker](https://docs.docker.com/) to manage 
 <!-- blablabla -->
 <!-- TODO Se a lista for maior que quantas linhas irá estourar a memória e melhor usar um redis? -->
+<!-- TODO code climate -->
 
 ### Requirements
 
@@ -36,7 +37,7 @@ GRU,CDG,75
 make start
 ```
 
-### Consuming via* terminal* interface
+### Consuming via* terminal* interface (client)
 
 <!-- TODO decrever como usar via terminal -->
 
