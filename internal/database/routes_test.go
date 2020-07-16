@@ -7,25 +7,38 @@ import (
 )
 
 const (
-	testFile string = "./testSuccess.csv"
+	validPath   string = "./testSuccess.csv"
+	invalidPath string = "./testFail.csv"
 )
 
 var (
-	testLines = []string{
+	validRoutes RouteDB
+	validLines  = []string{
 		"GRU,BRC,10.5",
 		"BRC,SCL,5",
 		"GRU,CDG,75",
 	}
+	invalidLines = []string{
+		"GRU,BRC,r4",
+	}
 )
 
 func init() {
-	if err := writeCsvFile(testFile, testLines); err != nil {
+	// Write valid file
+	if err := writeCsvFile(validPath, validLines); err != nil {
+		panic(err)
+	}
+
+	valid, _ := New(validPath)
+	validRoutes = valid
+
+	if err := writeCsvFile(invalidPath, invalidLines); err != nil {
 		panic(err)
 	}
 }
 
-func writeCsvFile(name string, lines []string) error {
-	f, err := os.Create(name)
+func writeCsvFile(path string, lines []string) error {
+	f, err := os.Create(path)
 	defer f.Close()
 	if err != nil {
 		return err
@@ -38,10 +51,8 @@ func writeCsvFile(name string, lines []string) error {
 }
 
 func TestLoadCsvSuccess(t *testing.T) {
-	defer os.Remove(testFile)
-	r := Routes{}
-	r.LoadCsv(testFile)
-
+	// defer os.Remove(validPath)
+	// validRoutes.loadCsv(validPath)
 	contains := func(sl []string, elem string) bool {
 		for _, n := range sl {
 			if elem == n {
@@ -51,29 +62,51 @@ func TestLoadCsvSuccess(t *testing.T) {
 		return false
 	}
 
-	for orig, v := range r {
+	for orig, v := range validRoutes.db {
 		for dest, pric := range v {
 			join := fmt.Sprintf("%s,%s,%v", orig, dest, pric)
-			if !contains(testLines, join) {
-				t.Errorf("\"%s\" doesn't contains \"%s\"", testLines, join)
+			if !contains(validLines, join) {
+				t.Errorf("\"%s\" doesn't contains \"%s\"", validLines, join)
 			}
 		}
 	}
 }
 
 func TestLoadCsvInexistentFail(t *testing.T) {
-	r := Routes{}
-	if err := r.LoadCsv("./inexistent.csv"); err == nil {
+	_, err := New("./inexistent.csv")
+	if err == nil {
 		t.Error("Must fail to read inexistent file")
 	}
 }
 
 func TestLoadCsvInvalid(t *testing.T) {
-	name := "./fail.csv"
-	writeCsvFile(name, []string{"a,b,3r"})
-	defer os.Remove(name)
-	r := Routes{}
-	if err := r.LoadCsv(name); err == nil {
+	// defer os.Remove(invalidPath)
+	_, err := New(invalidPath)
+	if err == nil {
 		t.Error("Must fail to load invalid price cell")
 	}
 }
+
+func TestInsertRouteSuccess(t *testing.T) {
+	if err := validRoutes.InsertRoute(Route{"A", "B", 12.4}); err != nil {
+		t.Error(err)
+	}
+}
+
+// func TestInsertRouteFail(t *testing.T) {
+// 	path := "./empty.csv"
+// 	if err := writeCsvFile(path, []string{"a,b,3"}); err != nil {
+// 		t.Error(err)
+// 	}
+// 	r, err := New(path)
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+
+// 	fmt.Println("sleeping")
+// 	time.Sleep(5 * time.Second)
+// 	os.Remove(path)
+// 	if err := r.InsertRoute(Route{"A", "B", 12.4}); err == nil {
+// 		t.Error("Must fail to insert on inexistent file")
+// 	}
+// }
