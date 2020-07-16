@@ -50,7 +50,7 @@ Duas interfaces de consulta devem ser implementadas:
     - Registro de novas rotas. Essas novas rotas devem ser persistidas no arquivo csv utilizado como input(input-routes.csv),
     - Consulta de melhor rota entre dois pontos.
 
-Também será necessária a implementação de 2 endpoints Rest, um para registro de rotas e outro para consula de melhor rota.
+Também será necessária a implementação de 2 endpoints Rest, um para registro de rotas e outro para consulta de melhor rota.
 
 ## Recomendações ##
 Para uma melhor fluides da nossa conversa, atente-se aos seguintes pontos:
