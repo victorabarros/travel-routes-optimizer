@@ -71,30 +71,30 @@ func (r RouteDB) fillRoutes(lines [][]string) (err error) {
 			return fmt.Errorf("field \"%s\", from line %d, isn't a valid value for price", line[2], idx+1)
 		}
 
-		_, prs := r.db[orig]
+		_, prs := r.db[orig] // TODO usar upper
 		if !prs {
 			r.db[orig] = make(map[string]float64)
 		}
 
-		r.db[orig][dest] = price
+		r.db[orig][dest] = price // TODO usar upper
 	}
 	return nil
 }
 
 // Route model
 type Route struct { //Todo improve name. better transfer?
-	Origin      string
-	Destination string
-	Price       float64
+	Origin      string  `json:"origin"`
+	Destination string  `json:"destination"`
+	Price       float64 `json:"price"`
 }
 
 // InsertRoute add new route to db
 func (r RouteDB) InsertRoute(route Route) error {
 	_, prs := r.db[route.Origin]
 	if !prs {
-		r.db[route.Origin] = make(map[string]float64)
+		r.db[route.Origin] = make(map[string]float64) // TODO usar upper
 	}
-	r.db[route.Origin][route.Destination] = route.Price
+	r.db[route.Origin][route.Destination] = route.Price // TODO usar upper
 
 	// TODO antes de escrever tem que valida se a linha já não existe usando o map.
 	// Se já existir, como sobreescrever?
@@ -116,110 +116,42 @@ func (r RouteDB) PrintAll() {
 	}
 }
 
-func (r RouteDB) iterSearch(orig, dest string, hist map[int]Route, bugget float64, bestOffer float64) (map[int]Route, float64) {
-	mids, _ := r.db[orig]
-	for mid, price := range mids {
-		if mid == dest {
-			if price < bestOffer {
-				hist[len(hist)] = Route{
-					orig,
-					mid,
-					price,
-				}
-				bugget += price
-			}
-		}
-		_, prs := r.db[mid]
-		if !prs {
-			continue
-		} else {
-			hist, bugget = r.iterSearch(mid, dest, hist, bugget, bestOffer)
-		}
-	}
-	return hist, bugget
-}
-
 // FindBestOffer find the cheapest transfer
 func (r RouteDB) FindBestOffer(orig, dest string) (map[int]Route, float64) {
-	var bestOffer float64 = math.Pow(2, 64)
+	var bestOffer float64 = math.MaxFloat64
 	schedule := make(map[int]Route)
 
 	_, prs := r.db[orig]
 	if !prs {
 		return schedule, bestOffer
 	}
-	// fmt.Printf("%s founded\n", orig)
 
-	return r.iterSearch(orig, dest, make(map[int]Route), 0.0, bestOffer)
-	// for mid, price := range offer {
-	// 	if mid == dest {
-	// 		if price < bestOffer {
-	// 			schedule[0] = Route{
-	// 				orig,
-	// 				mid,
-	// 				price,
-	// 			}
-	// 			bestOffer = price
-	// 		}
-	// 	}
-	// 	offers2, prs := r.db[mid]
-	// 	if !prs {
-	// 		continue
-	// 	} else {
-	// 		fmt.Printf("%s founded\n", mid)
-	// 		for mid2, price2 := range offers2 {
-	// 			if mid2 == dest {
-	// 				if price+price2 < bestOffer {
-	// 					schedule[0] = Route{
-	// 						orig,
-	// 						mid,
-	// 						price,
-	// 					}
-	// 					schedule[1] = Route{
-	// 						mid,
-	// 						mid2,
-	// 						price2,
-	// 					}
-	// 					bestOffer = price + price2
-	// 				}
-	// 			}
-	// 			offer3, prs := r.db[mid2]
-	// 			if !prs {
-	// 				continue
-	// 			} else {
-	// 				for mid3, price3 := range offer3 {
-	// 					if mid3 == dest {
-	// 						if price+price2+price3 < bestOffer {
-	// 							schedule[0] = Route{
-	// 								orig,
-	// 								mid,
-	// 								price,
-	// 							}
-	// 							schedule[1] = Route{
-	// 								mid,
-	// 								mid2,
-	// 								price2,
-	// 							}
-	// 							schedule[2] = Route{
-	// 								mid2,
-	// 								mid3,
-	// 								price3,
-	// 							}
-	// 							bestOffer = price + price2 + price3
-	// 						}
-	// 						_, prs := r.db[mid3]
-	// 						if !prs {
-	// 							continue
-	// 						} else {
-	// 							// ...
-	// 						}
-	// 					}
-	// 				}
-	// 				fmt.Printf("%s founded\n", mid2)
-	// 			}
-	// 		}
-	// 	}
-	// 	r.FindBestOffer(mid, dest)
-	// }
-	// return schedule, bestOffer
+	return r.iterSearch(orig, dest, make(map[int]Route), make(map[int]Route), 0.0, bestOffer)
+}
+
+func (r RouteDB) iterSearch(orig, dest string, hist, bestSched map[int]Route, bugget float64, bestOffer float64) (map[int]Route, float64) {
+	cnxs, _ := r.db[orig]
+	for cnx, price := range cnxs {
+		_, prs := r.db[cnx]
+		if cnx == dest && bugget+price < bestOffer {
+			bestSched = make(map[int]Route)
+			bestSched = hist
+			bestSched[len(bestSched)] = Route{
+				orig,
+				cnx,
+				price,
+			}
+			bestOffer = bugget + price
+		} else if prs {
+			_hist := make(map[int]Route)
+			_hist = hist
+			_hist[len(_hist)] = Route{
+				orig,
+				cnx,
+				price,
+			}
+			bestSched, bestOffer = r.iterSearch(cnx, dest, _hist, bestSched, bugget+price, bestOffer)
+		}
+	}
+	return bestSched, bestOffer
 }

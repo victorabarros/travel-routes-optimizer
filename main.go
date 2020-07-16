@@ -23,11 +23,8 @@ func main() {
 	}
 	defer rots.File.Close()
 
-	rots.PrintAll() // apagar
-
 	// Up Server
 	server.Run(rots, *csvName)
-
 	// terminal
 	time.Sleep(1 * time.Hour) // apagar
 }

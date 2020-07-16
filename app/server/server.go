@@ -74,6 +74,9 @@ func find(rw http.ResponseWriter, req *http.Request) {
 	} else if len(dest) > 1 {
 		err = fmt.Errorf("%s\n%s", err, "only one query param \"destination\" is allowed")
 	}
+	if orig[0] == dest[0] { //TODO: Usar uppercase
+		err = fmt.Errorf("%s\n%s", err, "origin and destination must be differents")
+	}
 
 	if err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
@@ -91,8 +94,8 @@ func find(rw http.ResponseWriter, req *http.Request) {
 	rw.WriteHeader(http.StatusOK)
 	rw.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(rw).Encode(struct {
-		Amout    float64
-		Schedule map[int]database.Route
+		Amout    float64                `json:"amout"`
+		Schedule map[int]database.Route `json:"schedule"`
 	}{
 		amount,
 		schedule,
