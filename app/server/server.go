@@ -7,19 +7,23 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/victorabarros/challenge-bexs/internal/database"
 )
 
 const (
-	port = "8092" // Move port to cfg
+	port = "8092" // TODO Move port to cfg
 )
 
 var (
 	// cfg, _  = config.Load()
+	db      database.RouteDB
 	started = time.Now()
 )
 
 // Run up the server.
-func Run() {
+func Run(rout database.RouteDB, fileName string) {
+	db = rout
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/healthz", livenessController)
@@ -52,23 +56,22 @@ func insertRoute(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Registra de novas rotas.Devem ser persistidas no arquivo csv
-	// r[payload.Origin][payload.Destination] = payload.Price
-	// f.WriteString(fmt.Sprintf("%s,%s,%v\n", payload.Origin, payload.Destination, payload.Price))
+	if err := db.InsertRoute(payload); err != nil {
+		panic(err)
+	}
 
 	rw.WriteHeader(http.StatusCreated)
 }
 
-// livenessController returns if pod is alive
+// livenessController is k8S liveness probe, returns if pod is alive
 // Based on: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-// k8S liveness probe
 func livenessController(rw http.ResponseWriter, req *http.Request) {
 	fmt.Println("Liveness route triggered")
 	response := struct {
 		ServiceName string
 		Version     string
 	}{
-		"Travel-Transfer-Optimizer",
+		"Travel-Route-Optimizer",
 		"v0.1.0",
 	}
 

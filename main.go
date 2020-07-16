@@ -10,26 +10,24 @@ import (
 )
 
 var (
-	csvName = flag.String("routes", "./challenge_description/input-file.txt", "travel routes file")
+	csvName = flag.String("routes", "./input-file.txt", "travel routes file")
 )
 
 func main() {
+	fmt.Println("Starting Service")
 	flag.Parse() // `go run main.go -h` for help flag
 
-	rots := database.Routes{}
-	if err := rots.LoadCsv(*csvName); err != nil {
+	rots, err := database.New(*csvName)
+	if err != nil {
 		panic(err)
 	}
+	defer rots.File.Close()
 
-	for origin, options := range rots {
-		for destination, price := range options {
-			fmt.Printf("%s\t%s\t%0.2f\n", origin, destination, price)
-		}
-	}
+	rots.PrintAll() // apagar
 
 	// Up Server
-	server.Run()
+	server.Run(rots, *csvName)
 
 	// terminal
-	time.Sleep(1 * time.Hour)
+	time.Sleep(1 * time.Hour) // apagar
 }
