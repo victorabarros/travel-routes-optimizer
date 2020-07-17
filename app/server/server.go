@@ -74,9 +74,6 @@ func find(rw http.ResponseWriter, req *http.Request) {
 	} else if len(dest) > 1 {
 		err = fmt.Errorf("%s\n%s", err, "only one query param \"destination\" is allowed")
 	}
-	if orig[0] == dest[0] { //TODO: Usar uppercase
-		err = fmt.Errorf("%s\n%s", err, "origin and destination must be differents")
-	}
 
 	if err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
@@ -85,7 +82,7 @@ func find(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	schedule, amount := db.FindBestOffer(orig[0], dest[0])
+	schedule, amount := db.FindBestOffer(orig[0], dest[0]) //TODO: Usar uppercase
 	if len(schedule) == 0 {
 		rw.WriteHeader(http.StatusNotFound)
 		return

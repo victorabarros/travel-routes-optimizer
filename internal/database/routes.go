@@ -122,36 +122,47 @@ func (r RouteDB) FindBestOffer(orig, dest string) (map[int]Route, float64) {
 	schedule := make(map[int]Route)
 
 	_, prs := r.db[orig]
-	if !prs {
+	if !prs || orig == dest {
 		return schedule, bestOffer
 	}
 
 	return r.iterSearch(orig, dest, make(map[int]Route), make(map[int]Route), 0.0, bestOffer)
 }
 
-func (r RouteDB) iterSearch(orig, dest string, hist, bestSched map[int]Route, bugget float64, bestOffer float64) (map[int]Route, float64) {
-	cnxs, _ := r.db[orig]
-	for cnx, price := range cnxs {
-		_, prs := r.db[cnx]
-		if cnx == dest && bugget+price < bestOffer {
+func (r RouteDB) iterSearch(orig, dest string,
+	hist, bestSched map[int]Route,
+	bugget, bestOffer float64) (map[int]Route, float64) {
+	connxs, _ := r.db[orig]
+	for connx, price := range connxs {
+		_, prs := r.db[connx]
+		if connx == dest && bugget+price < bestOffer {
 			bestSched = make(map[int]Route)
-			bestSched = hist
+			bestSched = deepCopy(hist)
 			bestSched[len(bestSched)] = Route{
 				orig,
-				cnx,
+				connx,
 				price,
 			}
 			bestOffer = bugget + price
 		} else if prs {
 			_hist := make(map[int]Route)
-			_hist = hist
+			_hist = deepCopy(hist)
 			_hist[len(_hist)] = Route{
 				orig,
-				cnx,
+				connx,
 				price,
 			}
-			bestSched, bestOffer = r.iterSearch(cnx, dest, _hist, bestSched, bugget+price, bestOffer)
+			bestSched, bestOffer = r.iterSearch(connx, dest, _hist,
+				bestSched, bugget+price, bestOffer)
 		}
 	}
 	return bestSched, bestOffer
+}
+
+func deepCopy(in map[int]Route) map[int]Route {
+	out := make(map[int]Route)
+	for k, v := range in {
+		out[k] = v
+	}
+	return out
 }
