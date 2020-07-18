@@ -29,6 +29,10 @@ debug: welcome
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		-p 8092:8092 --name ${APP_NAME} ${DOCKER_BASE_IMAGE} bash
 
+run-dev: welcome
+	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
+		-p 8092:8092 --name ${APP_NAME} ${DOCKER_BASE_IMAGE} go run main.go
+
 test:
 	@echo "\nInitalizing tests."
 	@docker run -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
