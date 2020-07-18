@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -65,18 +66,18 @@ func (r RouteDB) loadCsv() error {
 func (r RouteDB) fillRoutes(lines [][]string) (err error) {
 	for idx, line := range lines {
 		// Usar goroutine e mutex aqui
-		orig, dest := line[0], line[1]
+		orig, dest := strings.ToUpper(line[0]), strings.ToUpper(line[1])
 		price, ok := strconv.ParseFloat(line[2], 64)
 		if ok != nil {
 			return fmt.Errorf("field \"%s\", from line %d, isn't a valid value for price", line[2], idx+1)
 		}
 
-		_, prs := r.db[orig] // TODO usar upper
+		_, prs := r.db[orig]
 		if !prs {
 			r.db[orig] = make(map[string]float64)
 		}
 
-		r.db[orig][dest] = price // TODO usar upper
+		r.db[orig][dest] = price
 	}
 	return nil
 }
@@ -90,45 +91,40 @@ type Route struct { //Todo improve name. better transfer?
 
 // InsertRoute add new route to db
 func (r RouteDB) InsertRoute(route Route) error {
-	_, prs := r.db[route.Origin]
+	origin := strings.ToUpper(route.Origin)
+	_, prs := r.db[origin]
 	if !prs {
-		r.db[route.Origin] = make(map[string]float64) // TODO usar upper
+		r.db[origin] = make(map[string]float64)
 	}
-	r.db[route.Origin][route.Destination] = route.Price // TODO usar upper
+	dest := strings.ToUpper(route.Destination)
+	r.db[origin][dest] = route.Price
 
-	// TODO antes de escrever tem que valida se a linha já não existe usando o map.
-	// Se já existir, como sobreescrever?
 	if _, err := r.File.WriteString(
-		fmt.Sprintf("%s,%s,%v\n", route.Origin, route.Destination, route.Price)); err != nil {
+		fmt.Sprintf("%s,%s,%v\n", origin, dest, route.Price)); err != nil {
 		return err
 	}
 	return nil
 }
 
-// PrintAll print all routes
-func (r RouteDB) PrintAll() {
-	// TODO remove
-	fmt.Println("r.PrintAll")
-	for origin, options := range r.db {
-		for destination, price := range options {
-			fmt.Printf("\n%s\t%s\t%0.2f\n", origin, destination, price)
-		}
-	}
-}
-
 // FindBestOffer find the cheapest transfer
 func (r RouteDB) FindBestOffer(orig, dest string) (map[int]Route, float64) {
 	var bestOffer float64 = math.MaxFloat64
-	schedule := make(map[int]Route)
 
 	_, prs := r.db[orig]
 	if !prs || orig == dest {
-		return schedule, bestOffer
+		return nil, bestOffer
 	}
 
-	return r.iterSearch(orig, dest, make(map[int]Route), make(map[int]Route), 0.0, bestOffer)
+	sched, amount := r.iterSearch(orig, dest, make(map[int]Route), make(map[int]Route), 0.0, bestOffer)
+
+	if len(sched) == 0 {
+		sched = nil
+	}
+
+	return sched, amount
 }
 
+// support iterable method to FindBestOffer
 func (r RouteDB) iterSearch(orig, dest string,
 	hist, bestSched map[int]Route,
 	bugget, bestOffer float64) (map[int]Route, float64) {
@@ -160,6 +156,8 @@ func (r RouteDB) iterSearch(orig, dest string,
 }
 
 func deepCopy(in map[int]Route) map[int]Route {
+	// TODO fazer um repo de funções utils com map[interface]interface
+	// olhar no stack overflow
 	out := make(map[int]Route)
 	for k, v := range in {
 		out[k] = v

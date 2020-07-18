@@ -82,7 +82,7 @@ func find(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	schedule, amount := db.FindBestOffer(orig[0], dest[0]) //TODO: Usar uppercase
+	schedule, amount := db.FindBestOffer(orig[0], dest[0])
 	if len(schedule) == 0 {
 		rw.WriteHeader(http.StatusNotFound)
 		return
