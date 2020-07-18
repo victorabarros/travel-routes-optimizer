@@ -4,6 +4,7 @@ APP_NAME?=$(shell pwd | xargs basename)
 APP_DIR = /go/src/github.com/victorabarros/${APP_NAME}
 PWD=$(shell pwd)
 DOCKER_BASE_IMAGE=golang:1.14
+ROUTES?=./input-file.txt
 
 welcome:
 	@echo "\033[33m  _______                                 _       _____                    _             " && sleep .04
@@ -21,13 +22,24 @@ welcome:
 	@echo "\033[33m                        | |                                                              " && sleep .04
 	@echo "\033[33m                        |_|                                                            \n" && sleep .04
 
+build:
+	@rm -rf ./main
+	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
+		${DOCKER_BASE_IMAGE} go build main.go
+
 clean-up:
-	@docker rm -f ${APP_NAME}
+	@docker rm -f ${APP_NAME} ${APP_NAME}-server
 
 debug: welcome
 	@echo "\e[1m\033[33m\nDebug mode\e[0m"
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		-p 8092:8092 --name ${APP_NAME} ${DOCKER_BASE_IMAGE} bash
+
+run: welcome
+	@echo ${ROUTES}
+	@docker run -it -d -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
+		--env-file .env -p 8092:8092 --name ${APP_NAME}-server \
+		${DOCKER_BASE_IMAGE} ./main -routes ${ROUTES}
 
 run-dev: welcome
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
@@ -38,6 +50,7 @@ test:
 	@docker run -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		--env-file .env ${DOCKER_BASE_IMAGE} \
 		go test ./... -v -cover -race -coverprofile=c.out
+	@rm -rf internal/database/test*.csv
 
 test-log:
 	@echo "Writing dev/tests.log"

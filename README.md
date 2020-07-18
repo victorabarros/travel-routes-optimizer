@@ -32,8 +32,21 @@ GRU,CDG,75
 ...
 ```
 
+Args
+
 ```bash
-make run-dev
+go run main.go -h
+./main --help
+
+Starting Service
+Usage of /tmp/go-build314365757/b001/exe/main:
+  -routes string
+        travel routes file (default "./input-file.txt")
+```
+
+```bash
+make build
+make run ROUTES=./input-file.txt
 ```
 
 ### Consuming via* terminal* interface (client)
