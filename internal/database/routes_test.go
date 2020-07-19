@@ -29,7 +29,6 @@ var (
 )
 
 func init() {
-	// Write valid file
 	if err := writeCsvFile(validPath, validLines); err != nil {
 		panic(err)
 	}
@@ -275,7 +274,7 @@ func TestFindBestOfferSucess(t *testing.T) {
 	}
 
 	for _, _case := range cases {
-		sched, amount := validRoutes.FindBestOffer(_case.orig, _case.dest)
+		sched, amount := validRoutes.SearchBestOffer(_case.orig, _case.dest)
 		if amount != _case.amount {
 			t.Errorf("Amount %.2f and %.2f should be equals", amount, _case.amount)
 		}
@@ -339,7 +338,7 @@ func TestFindBestOfferNotFound(t *testing.T) {
 		},
 	}
 	for _, _case := range cases {
-		sched, amount := validRoutes.FindBestOffer(_case.orig, _case.dest)
+		sched, amount := validRoutes.SearchBestOffer(_case.orig, _case.dest)
 		if sched != nil || _case.amount != amount {
 			t.Errorf("schedule %+2v must be nil", sched)
 		}
