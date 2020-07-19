@@ -28,7 +28,7 @@ build:
 		${DOCKER_BASE_IMAGE} go build main.go
 
 clean-up:
-	@docker rm -f ${APP_NAME} ${APP_NAME}-server
+	@docker rm -f ${APP_NAME} ${APP_NAME}-server ${APP_NAME}-test
 
 debug: welcome
 	@echo "\e[1m\033[33m\nDebug mode\e[0m"
@@ -47,10 +47,10 @@ run-dev: welcome
 
 test:
 	@echo "\nInitalizing tests."
-	@docker run -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
-		--env-file .env ${DOCKER_BASE_IMAGE} \
+	@docker run --rm -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
+		--env-file .env --name ${APP_NAME}-test ${DOCKER_BASE_IMAGE} \
 		go test ./... -v -cover -race -coverprofile=c.out
-	@rm -rf internal/database/test*.csv
+	@rm -rf internal/database/test*.csv app/server/test*.csv
 
 test-log:
 	@echo "Writing dev/tests.log"

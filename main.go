@@ -3,10 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"time"
 
 	"github.com/victorabarros/challenge-bexs/app/server"
 	"github.com/victorabarros/challenge-bexs/internal/database"
+)
+
+const (
+	port = "8092" // TODO Move port to cfg
 )
 
 var (
@@ -24,7 +27,5 @@ func main() {
 	defer rots.File.Close()
 
 	// Up Server
-	server.Run(rots, *csvName)
-	// terminal
-	time.Sleep(1 * time.Hour) // apagar
+	server.Run(rots, *csvName, port)
 }

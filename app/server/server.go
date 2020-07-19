@@ -10,10 +10,6 @@ import (
 	"github.com/victorabarros/challenge-bexs/internal/database"
 )
 
-const (
-	port = "8092" // TODO Move port to cfg
-)
-
 var (
 	// cfg, _  = config.Load()
 	db    database.RouteDB
@@ -21,11 +17,11 @@ var (
 )
 
 // Run up the server.
-func Run(rout database.RouteDB, fileName string) {
+func Run(rout database.RouteDB, fileName, port string) {
 	db = rout
 	r := mux.NewRouter()
 	r.HandleFunc("/routes", insert).Methods(http.MethodPost)
-	r.HandleFunc("/routes", find).Methods(http.MethodGet)
+	r.HandleFunc("/routes", search).Methods(http.MethodGet)
 	r.HandleFunc("/healthz", liveness)
 	r.HandleFunc("/started", started)
 
@@ -35,11 +31,10 @@ func Run(rout database.RouteDB, fileName string) {
 	}
 
 	fmt.Printf("Up apllication at port %s\n", port)
-	go panic(srv.ListenAndServe())
+	panic(srv.ListenAndServe())
 }
 
 func insert(rw http.ResponseWriter, req *http.Request) {
-	fmt.Println("Starting \"createBook\" route")
 	payload := database.Route{}
 
 	err := json.NewDecoder(req.Body).Decode(&payload)
@@ -48,31 +43,45 @@ func insert(rw http.ResponseWriter, req *http.Request) {
 		rw.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(rw).Encode(struct{ Message string }{err.Error()})
 		return
+	} else if payload.Origin == "" || payload.Destination == "" {
+		rw.WriteHeader(http.StatusBadRequest)
+		rw.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(rw).Encode(
+			struct{ Message string }{"origin and destination can't be empty or nil"})
+		return
 	}
 
 	if err := db.InsertRoute(payload); err != nil {
-		panic(err)
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Header().Set("Content-Type", "application/json")
+		fmt.Println(err.Error()) // TODO usar logrus
+		json.NewEncoder(rw).Encode(
+			struct{ Message string }{http.StatusText(http.StatusInternalServerError)})
+		return
 	}
-
 	rw.WriteHeader(http.StatusCreated)
 }
 
-func find(rw http.ResponseWriter, req *http.Request) {
+func search(rw http.ResponseWriter, req *http.Request) {
 	var err error = nil
 	params := req.URL.Query()
 
 	orig, prs := params["origin"]
 	if !prs {
 		err = fmt.Errorf("%s\n%s", err, "query param \"origin\" is required")
-	} else if len(orig) > 1 {
-		err = fmt.Errorf("%s\n%s", err, "only one query param \"origin\" is allowed")
+	} else if len(orig) != 1 {
+		err = fmt.Errorf("%s\n%s", err, "only one query param \"origin\" is required")
+	} else if orig[0] == "" {
+		err = fmt.Errorf("%s\n%s", err, "\"origin\" is required")
 	}
 
 	dest, prs := params["destination"]
 	if !prs {
 		err = fmt.Errorf("%s\n%s", err, "query param \"destination\" is required")
-	} else if len(dest) > 1 {
-		err = fmt.Errorf("%s\n%s", err, "only one query param \"destination\" is allowed")
+	} else if len(dest) != 1 {
+		err = fmt.Errorf("%s\n%s", err, "only one query param \"destination\" is required")
+	} else if dest[0] == "" {
+		err = fmt.Errorf("%s\n%s", err, "\"destination\" is required")
 	}
 
 	if err != nil {
@@ -82,12 +91,12 @@ func find(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	schedule, amount := db.FindBestOffer(orig[0], dest[0])
+	schedule, amount := db.SearchBestOffer(orig[0], dest[0])
 	if len(schedule) == 0 {
 		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
-
+	fmt.Println("schedule result", schedule)
 	rw.WriteHeader(http.StatusOK)
 	rw.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(rw).Encode(struct {
