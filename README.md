@@ -4,14 +4,12 @@ Software developer challenge from Bexs bank
 
 ## Disclaimer
 
-To software's mission is to assert to client the best option of transfer for desired destination.
+To software's mission is to assert the cheapest travel for desired destination.
 
 ## Development
 
-The programming language choiced was [Golang](https://golang.org/), that's has good performance, 
-<!-- scalabity. E o author está desenvolvendo novas habilidades com ela. -->
-As good practice using [Docker](https://docs.docker.com/) to manage 
-<!-- TODO Se a lista for maior que quantas linhas irá estourar a memória e melhor usar um redis? -->
+The programming language choiced was [Golang](https://golang.org/).
+As good practice using [Docker](https://docs.docker.com/).
 <!-- TODO code climate -->
 
 ### Requirements
@@ -19,11 +17,22 @@ As good practice using [Docker](https://docs.docker.com/) to manage
 - [Docker](https://docs.docker.com/)
 - [GNU make](https://www.gnu.org/software/make/)
 
-## How to use
+## How to run
 
-### Starting
+#### write `.env` file
 
-Starting the software must arg the .txt/.csv file with catalog* as follow example:
+Similar to [.env.example](./.env.example)
+
+#### clean any "garbage"
+
+```bash
+make clean-containers
+make clean-network
+```
+
+### starting
+
+To start the software must arg the .txt/.csv file with catalog* as follow example:
 
 ```csv
 GRU,BRC,10
@@ -35,7 +44,6 @@ GRU,CDG,75
 Args
 
 ```bash
-go run main.go -h
 ./main --help
 
 Starting Service
@@ -49,7 +57,7 @@ make build
 make run ROUTES=./input-file.txt
 ```
 
-### Consuming via* terminal* interface (client)
+### Terminal interface client
 
 <!-- TODO decrever como usar via terminal -->
 

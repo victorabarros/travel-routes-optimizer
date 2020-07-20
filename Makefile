@@ -23,27 +23,44 @@ welcome:
 	@echo "\033[33m                        |_|                                                            \n" && sleep .04
 
 build:
-	@rm -rf ./main
+	@rm -rf ./bin/*
+	@docker network create bexs-net
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		${DOCKER_BASE_IMAGE} go build main.go
+	@mv ./main ./bin/
+	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
+		${DOCKER_BASE_IMAGE} go build app/client/client.go
+	@mv ./client ./bin/
 
-clean-up:
-	@docker rm -f ${APP_NAME} ${APP_NAME}-server ${APP_NAME}-test
+clean-containers:
+	@docker rm -f ${APP_NAME}-debug ${APP_NAME}-server ${APP_NAME}-client ${APP_NAME}-test
+	@docker network rm bexs-net
 
-debug: welcome
+clean-network:
+	@docker network rm bexs-net
+
+debug:
 	@echo "\e[1m\033[33m\nDebug mode\e[0m"
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
-		-p 8092:8092 --name ${APP_NAME} ${DOCKER_BASE_IMAGE} bash
+		-p 8092:8092 --name ${APP_NAME}-debug ${DOCKER_BASE_IMAGE} bash
 
 run: welcome
-	@echo ${ROUTES}
-	@docker run -it -d -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
-		--env-file .env -p 8092:8092 --name ${APP_NAME}-server \
-		${DOCKER_BASE_IMAGE} ./main -routes ${ROUTES}
-
-run-dev: welcome
+	@echo "\e[1m\033[33m\nServer up\e[0m"
+	@docker run -itd -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
+		--env-file .env -p 8092:8092 --network bexs-net --name ${APP_NAME}-server \
+		${DOCKER_BASE_IMAGE} ./bin/main -routes ${ROUTES}
+	@echo "\e[1m\033[33m\nClient:\e[0m"
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
-		-p 8092:8092 --name ${APP_NAME} ${DOCKER_BASE_IMAGE} go run main.go
+		--network bexs-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} ./bin/client
+
+run-dev:
+	@docker network create bexs-net
+	@echo "\e[1m\033[33m\nServer up\e[0m"
+	@docker run -itd -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
+		-p 8092:8092 --network bexs-net --name ${APP_NAME}-server ${DOCKER_BASE_IMAGE} go run main.go -routes ${ROUTES}
+	@echo "\e[1m\033[33m\nClient:\e[0m"
+	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
+		--network bexs-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} go run app/client/client.go
 
 test:
 	@echo "\nInitalizing tests."
