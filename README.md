@@ -62,7 +62,7 @@ Usage of /tmp/go-build314365757/b001/exe/main:
 #### start
 
 ```bash
-make run
+make run ROUTES=./input-file.txt
 ```
 
 ## Terminal interface client
