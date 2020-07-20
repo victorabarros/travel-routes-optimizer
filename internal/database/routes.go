@@ -40,7 +40,7 @@ func New(csvPath string) (RouteDB, error) {
 
 // loadCsv loads the startup csv file
 func (r RouteDB) loadCsv() error {
-	logrus.Debug("Loading file %s\n", r.csvName)
+	logrus.Debugf("Loading file %s\n", r.csvName)
 	csvLines, err := csv.NewReader(r.File).ReadAll()
 	if err != nil {
 		return err

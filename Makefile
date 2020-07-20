@@ -79,7 +79,7 @@ test-log:
 	@echo "Writing dev/tests-summ.log"
 	@cat dev/tests.log  | grep "coverage: " > dev/tests-summ.log
 
-test-html-coverage:
+test-coverage:
 	@echo "Building c.out"
 	@rm -rf c.out
 	@make test

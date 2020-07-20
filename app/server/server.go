@@ -32,7 +32,7 @@ func Run(rout database.RouteDB, fileName, port string) {
 		Handler: r,
 	}
 
-	logrus.Debug("Up apllication at port %s\n", port)
+	logrus.Debugf("Up apllication at port %s\n", port)
 	panic(srv.ListenAndServe())
 }
 

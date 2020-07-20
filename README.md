@@ -105,8 +105,6 @@ To insert new route. It will be perssistent on data inputed file.
 
 ## Tests
 
-Test coverage:
-
 ```bash
-make test-html-coverage
+make test-coverage
 ```
