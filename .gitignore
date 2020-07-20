@@ -127,3 +127,4 @@ test*.log
 test*.csv
 input-file.txt
 main
+bin/*
