@@ -10,7 +10,6 @@ To software's mission is to assert the cheapest travel for desired destination.
 
 The programming language choiced was [Golang](https://golang.org/).
 As good practice using [Docker](https://docs.docker.com/).
-<!-- TODO code climate -->
 
 ### Requirements
 
@@ -18,6 +17,18 @@ As good practice using [Docker](https://docs.docker.com/).
 - [GNU make](https://www.gnu.org/software/make/)
 
 ## How to run
+
+### csv
+
+To start the software needs a file with possibles routes.
+Example:
+
+```csv
+GRU,BRC,10
+BRC,SCL,5
+GRU,CDG,75
+...
+```
 
 #### write `.env` file
 
@@ -30,18 +41,14 @@ make clean-containers
 make clean-network
 ```
 
-### starting
+#### set and build
 
-To start the software must arg the .txt/.csv file with catalog* as follow example:
-
-```csv
-GRU,BRC,10
-BRC,SCL,5
-GRU,CDG,75
-...
+```bash
+make create-network
+make build
 ```
 
-Args
+#### flags
 
 ```bash
 ./main --help
@@ -52,36 +59,54 @@ Usage of /tmp/go-build314365757/b001/exe/main:
         travel routes file (default "./input-file.txt")
 ```
 
+#### start
+
 ```bash
-make build
-make run ROUTES=./input-file.txt
+make run
 ```
 
-### Terminal interface client
+## Terminal interface client
 
-<!-- TODO decrever como usar via terminal -->
+Enter `ORG-DES` format.
+Example:
+
+```bash
+GRU-ORL
+```
+
+Answer:
+
+```bash
+best route: BRC - SCL - GRU - ORL > $35.00
+```
 
 ### Server
 
-<!-- TODO decrever como usar via api -->
-<!-- TODO add postman collection -->
-
-Routes:
-
 ### Healthcheck
 
-`/liveness`
-<!-- TODO liveness readness as k8s pattern-->
+Based on [k8s best practices](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
 
-### Tests
+- `/healthz`
+- `/started`
+
+### Search
+
+To find the cheapest transfer travel option.
+
+- `/routes?origin=GRU&destination=ORL`
+
+### Insert
+
+To insert new route. It will be perssistent on data inputed file.
+
+- `/routes`
+  - `Method: Post`
+  - `Body: {"origin": "GRU", "destination": "BRC", "price": 10}`
+
+## Tests
+
+Test coverage:
 
 ```bash
 make test-html-coverage
 ```
-
-## References
-
-- https://github.com/ardanlabs/service/wiki
-- https://www.dudley.codes/posts/2020.05.19-golang-structure-web-servers
-
-<!-- TODO add dockerignore -->

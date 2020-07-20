@@ -24,7 +24,6 @@ welcome:
 
 build:
 	@rm -rf ./bin/*
-	@docker network create bexs-net
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		${DOCKER_BASE_IMAGE} go build main.go
 	@mv ./main ./bin/
@@ -38,6 +37,9 @@ clean-containers:
 
 clean-network:
 	@docker network rm bexs-net
+
+create-network:
+	@docker network create bexs-net
 
 debug:
 	@echo "\e[1m\033[33m\nDebug mode\e[0m"
@@ -53,11 +55,12 @@ run: welcome
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		--network bexs-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} ./bin/client
 
-run-dev:
-	@docker network create bexs-net
+run-srv:
 	@echo "\e[1m\033[33m\nServer up\e[0m"
 	@docker run -itd -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		-p 8092:8092 --network bexs-net --name ${APP_NAME}-server ${DOCKER_BASE_IMAGE} go run main.go -routes ${ROUTES}
+
+run-cli:
 	@echo "\e[1m\033[33m\nClient:\e[0m"
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		--network bexs-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} go run app/client/client.go
