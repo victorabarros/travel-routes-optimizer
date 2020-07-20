@@ -4,14 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"
 	"github.com/victorabarros/challenge-bexs/internal/database"
 )
 
 var (
-	// cfg, _  = config.Load()
 	db    database.RouteDB
 	start = time.Now()
 )
@@ -30,17 +32,19 @@ func Run(rout database.RouteDB, fileName, port string) {
 		Handler: r,
 	}
 
-	fmt.Printf("Up apllication at port %s\n", port)
+	logrus.Debug("Up apllication at port %s\n", port)
 	panic(srv.ListenAndServe())
 }
 
 func insert(rw http.ResponseWriter, req *http.Request) {
+	logrus.Debug("route \"insert\" started")
 	payload := database.Route{}
 
 	err := json.NewDecoder(req.Body).Decode(&payload)
 	if err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
 		rw.Header().Set("Content-Type", "application/json")
+		logrus.Debug(err.Error())
 		json.NewEncoder(rw).Encode(struct{ Message string }{err.Error()})
 		return
 	} else if payload.Origin == "" || payload.Destination == "" {
@@ -54,7 +58,7 @@ func insert(rw http.ResponseWriter, req *http.Request) {
 	if err := db.InsertRoute(payload); err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
 		rw.Header().Set("Content-Type", "application/json")
-		fmt.Println(err.Error()) // TODO usar logrus
+		logrus.Error(err.Error())
 		json.NewEncoder(rw).Encode(
 			struct{ Message string }{http.StatusText(http.StatusInternalServerError)})
 		return
@@ -63,6 +67,7 @@ func insert(rw http.ResponseWriter, req *http.Request) {
 }
 
 func search(rw http.ResponseWriter, req *http.Request) {
+	logrus.Debug("route \"search\" started")
 	var err error = nil
 	params := req.URL.Query()
 
@@ -87,16 +92,17 @@ func search(rw http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
 		rw.Header().Set("Content-Type", "application/json")
+		logrus.Debug(err.Error())
 		json.NewEncoder(rw).Encode(struct{ Message string }{err.Error()})
 		return
 	}
 
-	schedule, amount := db.SearchBestOffer(orig[0], dest[0])
-	if len(schedule) == 0 {
+	sched, amount := db.SearchBestOffer(strings.ToUpper(orig[0]), strings.ToUpper(dest[0]))
+	if len(sched) == 0 {
 		rw.WriteHeader(http.StatusNotFound)
 		return
 	}
-	fmt.Println("schedule result", schedule)
+
 	rw.WriteHeader(http.StatusOK)
 	rw.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(rw).Encode(struct {
@@ -104,13 +110,14 @@ func search(rw http.ResponseWriter, req *http.Request) {
 		Schedule map[int]database.Route `json:"schedule"`
 	}{
 		amount,
-		schedule,
+		sched,
 	})
 }
 
 // liveness is k8S liveness probe, returns if pod is alive
 // Based on: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 func liveness(rw http.ResponseWriter, req *http.Request) {
+	logrus.Debug("route \"healthz\" started")
 	rw.WriteHeader(http.StatusOK)
 	rw.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(rw).Encode(struct {
@@ -124,6 +131,7 @@ func liveness(rw http.ResponseWriter, req *http.Request) {
 
 // started returns how long is the container up
 func started(rw http.ResponseWriter, req *http.Request) {
+	logrus.Debug("route \"started\" started")
 	rw.WriteHeader(http.StatusOK)
 	rw.Write([]byte((time.Since(start)).String()))
 }

@@ -8,24 +8,35 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
+	"github.com/victorabarros/challenge-bexs/internal/config"
 	"github.com/victorabarros/challenge-bexs/internal/database"
 )
 
-const (
-	port = "8092"
+var (
+	port string
+	srv  string
 )
 
 func main() {
-	input := bufio.NewScanner(os.Stdin)
+	cfg, err := config.Load()
+	if err != nil {
+		fmt.Println("Error in load Enviromnts variables.")
+	}
+	port = strconv.Itoa(cfg.Port)
+	srv = cfg.Server
 
-	fmt.Println("please enter the route")
+	input := bufio.NewScanner(os.Stdin)
+	msg := "please enter the route"
+	fmt.Println(msg)
+
 	for input.Scan() {
 		line := input.Text()
 		if line != "" {
 			handlerInput(line)
-			fmt.Println("\nplease enter the route")
+			fmt.Println("\n" + msg)
 		}
 	}
 }
@@ -38,7 +49,7 @@ func handlerInput(line string) {
 	}
 
 	orig, dest := lineSplited[0], lineSplited[1]
-	url := fmt.Sprintf("http://challenge-bexs-server:%s/routes?origin=%s&destination=%s", port, orig, dest)
+	url := fmt.Sprintf("http://%s:%s/routes?origin=%s&destination=%s", srv, port, orig, dest)
 
 	resp, err := http.Get(url)
 	if err != nil {

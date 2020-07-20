@@ -2,14 +2,12 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"strconv"
 
+	"github.com/sirupsen/logrus"
 	"github.com/victorabarros/challenge-bexs/app/server"
+	"github.com/victorabarros/challenge-bexs/internal/config"
 	"github.com/victorabarros/challenge-bexs/internal/database"
-)
-
-const (
-	port = "8092" // TODO Move port to cfg
 )
 
 var (
@@ -17,8 +15,19 @@ var (
 )
 
 func main() {
-	fmt.Println("Starting Service")
 	flag.Parse() // `go run main.go -h` for help flag
+
+	cfg, err := config.Load()
+	if err != nil {
+		logrus.WithError(err).Fatal("Error in load Enviromnts variables.")
+	}
+
+	loglvl, err := logrus.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		logrus.WithError(err).Fatalf(
+			"Error in set log level %s.", cfg.LogLevel)
+	}
+	logrus.SetLevel(loglvl)
 
 	rots, err := database.New(*csvName)
 	if err != nil {
@@ -27,5 +36,5 @@ func main() {
 	defer rots.File.Close()
 
 	// Up Server
-	server.Run(rots, *csvName, port)
+	server.Run(rots, *csvName, strconv.Itoa(cfg.Port))
 }

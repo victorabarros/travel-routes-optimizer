@@ -8,11 +8,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // RouteDB is the model of travel routes at database layer
 type RouteDB struct {
-	db      map[string]map[string]float64 // TODO improte name
+	db      map[string]map[string]float64
 	csvName string
 	File    *os.File
 }
@@ -38,7 +40,7 @@ func New(csvPath string) (RouteDB, error) {
 
 // loadCsv loads the startup csv file
 func (r RouteDB) loadCsv() error {
-	fmt.Printf("Loading file %s\n", r.csvName)
+	logrus.Debug("Loading file %s\n", r.csvName)
 	csvLines, err := csv.NewReader(r.File).ReadAll()
 	if err != nil {
 		return err
@@ -104,7 +106,7 @@ func (r RouteDB) InsertRoute(route Route) error {
 	dest := strings.ToUpper(route.Destination)
 	r.db[orig][dest] = route.Price
 
-	line := fmt.Sprintf("%s,%s,%v\n", orig, dest, route.Price)
+	line := fmt.Sprintf("\n%s,%s,%v\n", orig, dest, route.Price)
 	if _, err := r.File.WriteString(line); err != nil {
 		return err
 	}
