@@ -23,7 +23,7 @@ welcome:
 	@echo "\033[33m                        |_|                                                            \n" && sleep .04
 
 build:
-	@rm -rf ./bin/*
+	@rm -rf ./bin/client ./bin/main
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		${DOCKER_BASE_IMAGE} go build main.go
 	@mv ./main ./bin/
