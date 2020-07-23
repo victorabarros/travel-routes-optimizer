@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/victorabarros/challenge-bexs/internal/database"
+	"github.com/victorabarros/travel-routes-optimizer/internal/database"
 )
 
 const (

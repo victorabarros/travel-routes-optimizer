@@ -1,6 +1,6 @@
-# Bexs-Challenge
+# traver routes optimizer
 
-Software developer challenge from Bexs bank
+Software developer challenge
 
 ## Disclaimer
 

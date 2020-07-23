@@ -1,4 +1,4 @@
-module github.com/victorabarros/challenge-bexs
+module github.com/victorabarros/traver-routes-optimizer
 
 go 1.13
 

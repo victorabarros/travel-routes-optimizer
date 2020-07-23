@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/gorilla/mux"
-	"github.com/victorabarros/challenge-bexs/internal/database"
+	"github.com/victorabarros/travel-routes-optimizer/internal/database"
 )
 
 var (

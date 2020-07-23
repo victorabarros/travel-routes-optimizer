@@ -22,7 +22,7 @@ func Load() (*Config, error) {
 	}
 	viper.SetDefault("LOG_LEVEL", "INFO")
 	viper.SetDefault("PORT", 8092)
-	viper.SetDefault("SERVER", "challenge-bexs-server")
+	viper.SetDefault("SERVER", "traver-routes-optimizer-server")
 
 	viper.AutomaticEnv()
 	if err := viper.Unmarshal(&cfg); err != nil {

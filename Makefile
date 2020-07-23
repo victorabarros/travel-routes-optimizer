@@ -33,13 +33,13 @@ build:
 
 clean-containers:
 	@docker rm -f ${APP_NAME}-debug ${APP_NAME}-server ${APP_NAME}-client ${APP_NAME}-test
-	@docker network rm bexs-net
+	@docker network rm routes-optimizer-net
 
 clean-network:
-	@docker network rm bexs-net
+	@docker network rm routes-optimizer-net
 
 create-network:
-	@docker network create bexs-net
+	@docker network create routes-optimizer-net
 
 debug:
 	@echo "\e[1m\033[33m\nDebug mode\e[0m"
@@ -49,21 +49,21 @@ debug:
 run: welcome
 	@echo "\e[1m\033[33m\nServer up\e[0m"
 	@docker run -itd -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
-		--env-file .env -p 8092:8092 --network bexs-net --name ${APP_NAME}-server \
+		--env-file .env -p 8092:8092 --network routes-optimizer-net --name ${APP_NAME}-server \
 		${DOCKER_BASE_IMAGE} ./bin/main -routes ${ROUTES}
 	@echo "\e[1m\033[33m\nClient:\e[0m"
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
-		--network bexs-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} ./bin/client
+		--network routes-optimizer-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} ./bin/client
 
 run-srv:
 	@echo "\e[1m\033[33m\nServer up\e[0m"
 	@docker run -itd -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
-		-p 8092:8092 --network bexs-net --name ${APP_NAME}-server ${DOCKER_BASE_IMAGE} go run main.go -routes ${ROUTES}
+		-p 8092:8092 --network routes-optimizer-net --name ${APP_NAME}-server ${DOCKER_BASE_IMAGE} go run main.go -routes ${ROUTES}
 
 run-cli:
 	@echo "\e[1m\033[33m\nClient:\e[0m"
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
-		--network bexs-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} go run app/client/client.go
+		--network routes-optimizer-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} go run app/client/client.go
 
 test:
 	@echo "\nInitalizing tests."

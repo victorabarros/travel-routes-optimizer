@@ -5,9 +5,9 @@ import (
 	"strconv"
 
 	"github.com/sirupsen/logrus"
-	"github.com/victorabarros/challenge-bexs/app/server"
-	"github.com/victorabarros/challenge-bexs/internal/config"
-	"github.com/victorabarros/challenge-bexs/internal/database"
+	"github.com/victorabarros/travel-routes-optimizer/app/server"
+	"github.com/victorabarros/travel-routes-optimizer/internal/config"
+	"github.com/victorabarros/travel-routes-optimizer/internal/database"
 )
 
 var (

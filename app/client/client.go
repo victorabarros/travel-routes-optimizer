@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/victorabarros/challenge-bexs/internal/config"
-	"github.com/victorabarros/challenge-bexs/internal/database"
+	"github.com/victorabarros/travel-routes-optimizer/internal/config"
+	"github.com/victorabarros/travel-routes-optimizer/internal/database"
 )
 
 var (
