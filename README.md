@@ -1,4 +1,4 @@
-# traver routes optimizer
+# travel routes optimizer
 
 Software developer challenge
 
