@@ -1,5 +1,7 @@
 # travel routes optimizer
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability)](https://codeclimate.com/github/victorabarros/travel-routes-optimizer)
+<!-- TODO circleci, codeclimate test coverage -->
 Software developer challenge
 
 ## Disclaimer
