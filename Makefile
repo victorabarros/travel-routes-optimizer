@@ -65,15 +65,19 @@ run-cli:
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		--network routes-optimizer-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} go run app/client/client.go
 
+_test:
+	@go test ./... -v -cover -race -coverprofile=c.out
+	@rm -rf internal/database/test*.csv app/server/test*.csv
+
 test:
 	@echo "\nInitalizing tests."
 	@docker run --rm -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		--env-file .env --name ${APP_NAME}-test ${DOCKER_BASE_IMAGE} \
-		go test ./... -v -cover -race -coverprofile=c.out
-	@rm -rf internal/database/test*.csv app/server/test*.csv
+		make _test
 
 test-log:
 	@echo "Writing dev/tests.log"
+	@[ ! -d "./dev" ] && mkdir dev
 	@rm -rf dev/tests*.log
 	@make test > dev/tests.log
 	@echo "Writing dev/tests-summ.log"

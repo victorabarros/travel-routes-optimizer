@@ -5,4 +5,4 @@ jobs:
       - image: golang:1.14
     steps:
       - checkout # check out the code in the project directory
-      - run: make test
+      - run: make _test
