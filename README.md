@@ -1,7 +1,7 @@
 # travel routes optimizer
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability)](https://codeclimate.com/github/victorabarros/travel-routes-optimizer) [![Go Report Card](https://goreportcard.com/badge/github.com/victorabarros/travel-routes-optimizer)](https://goreportcard.com/report/github.com/victorabarros/travel-routes-optimizer) [![MIT Licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/victorabarros/travel-routes-optimizer/master/LICENSE)
-<!-- TODO circleci, codeclimate test coverage, license link -->
+[![CircleCI Build Status](https://circleci.com/gh/CircleCI-Public/circleci-demo-go.svg?style=svg)](https://app.circleci.com/pipelines/github/victorabarros/travel-routes-optimizer)
 
 Software developer challenge
 

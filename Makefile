@@ -22,14 +22,15 @@ welcome:
 	@echo "\033[33m                        | |                                                              " && sleep .04
 	@echo "\033[33m                        |_|                                                            \n" && sleep .04
 
-build:
+_build:
 	@rm -rf ./bin/client ./bin/main
-	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
-		${DOCKER_BASE_IMAGE} go build main.go
+	@go build main.go && go build app/client/client.go
 	@mv ./main ./bin/
-	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
-		${DOCKER_BASE_IMAGE} go build app/client/client.go
 	@mv ./client ./bin/
+
+build:
+	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
+		${DOCKER_BASE_IMAGE} make _build
 
 clean-containers:
 	@docker rm -f ${APP_NAME}-debug ${APP_NAME}-server ${APP_NAME}-client ${APP_NAME}-test
@@ -77,7 +78,7 @@ test:
 
 test-log:
 	@echo "Writing dev/tests.log"
-	@[ ! -d "./dev" ] && mkdir dev
+	@[ ! -d "./dev" ] && mkdir dev || : # make dev folder, if not exists
 	@rm -rf dev/tests*.log
 	@make test > dev/tests.log
 	@echo "Writing dev/tests-summ.log"
