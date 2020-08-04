@@ -1,8 +1,14 @@
 version: 2.1
 jobs:
   build:
-    docker: 
+    docker:
       - image: golang:1.14
     steps:
-      - checkout # check out the code in the project directory
-      - run: make _test
+      - checkout
+      - run:
+          name: Running tests
+          command: make _test
+
+      - run:
+          name: Bulding
+          command: make _build
