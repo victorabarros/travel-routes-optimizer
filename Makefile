@@ -6,21 +6,25 @@ PWD=$(shell pwd)
 DOCKER_BASE_IMAGE=golang:1.14
 ROUTES?=./input-file.txt
 
+YELLOW=\e[1m\033[33m
+COLOR_OFF=\e[0m
+
 welcome:
-	@echo "\033[33m  _______                                 _       _____                    _             " && sleep .04
-	@echo "\033[33m |__   __|                               | |     |  __ \                  | |            " && sleep .04
-	@echo "\033[33m    | |     _ __    __ _  __   __   ___  | |     | |__) |   ___    _   _  | |_    ___    " && sleep .04
-	@echo "\033[33m    | |    | '__|  / _' | \ \ / /  / _ \ | |     |  _  /   / _ \  | | | | | __|  / _ \   " && sleep .04
-	@echo "\033[33m    | |    | |    | (_| |  \ V /  |  __/ | |     | | \ \  | (_) | | |_| | | |_  |  __/   " && sleep .04
-	@echo "\033[33m    |_|    |_|     \__,_|   \_/    \___| |_|     |_|  \_\  \___/   \__,_|  \__|  \___| \n" && sleep .04
-	@echo "\033[33m                 ____            _     _               _                                 " && sleep .04
-	@echo "\033[33m                / __ \          | |   (_)             (_)                                " && sleep .04
-	@echo "\033[33m               | |  | |  _ __   | |_   _   _ __ ___    _   ____   ___   _ __             " && sleep .04
-	@echo "\033[33m               | |  | | | '_ \  | __| | | | '_ ' _ \  | | |_  /  / _ \ | '__|            " && sleep .04
-	@echo "\033[33m               | |__| | | |_) | | |_  | | | | | | | | | |  / /  |  __/ | |               " && sleep .04
-	@echo "\033[33m                \____/  | .__/   \__| |_| |_| |_| |_| |_| /___|  \___| |_|               " && sleep .04
-	@echo "\033[33m                        | |                                                              " && sleep .04
-	@echo "\033[33m                        |_|                                                            \n" && sleep .04
+	@echo "${YELLOW}"
+	@echo " _______                                 _       _____                    _             " && sleep .04
+	@echo "|__   __|                               | |     |  __ \                  | |            " && sleep .04
+	@echo "   | |     _ __    __ _  __   __   ___  | |     | |__) |   ___    _   _  | |_    ___    " && sleep .04
+	@echo "   | |    | '__|  / _' | \ \ / /  / _ \ | |     |  _  /   / _ \  | | | | | __|  / _ \   " && sleep .04
+	@echo "   | |    | |    | (_| |  \ V /  |  __/ | |     | | \ \  | (_) | | |_| | | |_  |  __/   " && sleep .04
+	@echo "   |_|    |_|     \__,_|   \_/    \___| |_|     |_|  \_\  \___/   \__,_|  \__|  \___| \n" && sleep .04
+	@echo "                ____            _     _               _                                 " && sleep .04
+	@echo "               / __ \          | |   (_)             (_)                                " && sleep .04
+	@echo "              | |  | |  _ __   | |_   _   _ __ ___    _   ____   ___   _ __             " && sleep .04
+	@echo "              | |  | | | '_ \  | __| | | | '_ ' _ \  | | |_  /  / _ \ | '__|            " && sleep .04
+	@echo "              | |__| | | |_) | | |_  | | | | | | | | | |  / /  |  __/ | |               " && sleep .04
+	@echo "               \____/  | .__/   \__| |_| |_| |_| |_| |_| /___|  \___| |_|               " && sleep .04
+	@echo "                       | |                                                              " && sleep .04
+	@echo "                       |_|                                                            \n${COLOR_OFF}" && sleep .04
 
 _build:
 	@rm -rf ./bin/client ./bin/main
@@ -43,26 +47,26 @@ create-network:
 	@docker network create routes-optimizer-net
 
 debug:
-	@echo "\e[1m\033[33m\nDebug mode\e[0m"
+	@echo "${YELLOW}\nDebug mode${COLOR_OFF}"
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		-p 8092:8092 --name ${APP_NAME}-debug ${DOCKER_BASE_IMAGE} bash
 
 run: welcome
-	@echo "\e[1m\033[33m\nServer up\e[0m"
+	@echo "${YELLOW}\nServer up${COLOR_OFF}"
 	@docker run -itd -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		--env-file .env -p 8092:8092 --network routes-optimizer-net --name ${APP_NAME}-server \
 		${DOCKER_BASE_IMAGE} ./bin/main -routes ${ROUTES}
-	@echo "\e[1m\033[33m\nClient:\e[0m"
+	@echo "${YELLOW}\nClient:${COLOR_OFF}"
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		--network routes-optimizer-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} ./bin/client
 
 run-srv:
-	@echo "\e[1m\033[33m\nServer up\e[0m"
+	@echo "${YELLOW}\nServer up${COLOR_OFF}"
 	@docker run -itd -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		-p 8092:8092 --network routes-optimizer-net --name ${APP_NAME}-server ${DOCKER_BASE_IMAGE} go run main.go -routes ${ROUTES}
 
 run-cli:
-	@echo "\e[1m\033[33m\nClient:\e[0m"
+	@echo "${YELLOW}\nClient:${COLOR_OFF}"
 	@docker run -it -v ${PWD}:${APP_DIR} -w ${APP_DIR} \
 		--network routes-optimizer-net --name ${APP_NAME}-client ${DOCKER_BASE_IMAGE} go run app/client/client.go
 
